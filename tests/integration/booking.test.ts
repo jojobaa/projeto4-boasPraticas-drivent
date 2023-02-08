@@ -173,7 +173,7 @@ describe("POST /booking", () => {
             const hotel = await createHotel();
             const room = await createRoomWithHotelId(hotel.id);
 
-            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: 12});
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id + 1});
 
             expect(response.status).toEqual(httpStatus.NOT_FOUND);
         });
