@@ -159,9 +159,9 @@ describe("POST /booking", () => {
             const room = await createRoomWithHotelId(hotel.id);
             const validPostBody = createValidePostBody();
 
-            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id});
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: 0});
 
-            expect(response.status).toEqual(httpStatus.OK);
+            expect(response.status).toEqual(httpStatus.BAD_REQUEST);
         });
     });
 });
