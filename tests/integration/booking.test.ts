@@ -132,6 +132,38 @@ describe("POST /booking", () => {
 
         expect(response.status).toBe(httpStatus.UNAUTHORIZED);
     });
+    describe("when token is valid", () => {
+        it("should respond with status 200 with a valid body", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const payment = await createPayment(ticket.id, ticketType.price);
+            const hotel = await createHotel();
+            const room = await createRoomWithHotelId(hotel.id);
+            const validPostBody = createValidePostBody();
+
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id});
+
+            expect(response.status).toEqual(httpStatus.OK);
+        });
+        it("should respond with status 400 with a invalid body", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const payment = await createPayment(ticket.id, ticketType.price);
+            const hotel = await createHotel();
+            const room = await createRoomWithHotelId(hotel.id);
+            const validPostBody = createValidePostBody();
+
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id});
+
+            expect(response.status).toEqual(httpStatus.OK);
+        });
+    });
 });
 
 
