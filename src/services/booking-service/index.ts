@@ -12,8 +12,7 @@ async function getBooking(userId: number) {
     return booking;
 }
 
-
-async function postBookingRoom(userId: number, roomId: number) {
+async function checkEnrollmentTicket(userId: number) {
     const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
     if (!enrollment) {
         throw cannotBookingError();
@@ -23,38 +22,30 @@ async function postBookingRoom(userId: number, roomId: number) {
     if (!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
         throw cannotBookingError();
     }
+}
 
+async function checkValidBooking(roomId: number) {
     const room = await roomRepository.findRoomById(roomId)
     const bookings = await bookingRepository.findByRoomId(roomId);
     if (room.capacity <= bookings.length) {
         throw cannotBookingError();
     }
+}
+
+async function postBookingRoom(userId: number, roomId: number) {
+    await checkEnrollmentTicket(userId);
+    await checkValidBooking(roomId);
     return bookingRepository.createBooking({ roomId, userId });
 }
 
 async function putBookingRoom(userId: number, roomId: number) {
-    const enrollment = await enrollmentRepository.findWithAddressByUserId(userId);
-    if (!enrollment) {
-        throw cannotBookingError();
-    }
-
-    const ticket = await ticketRepository.findTicketByEnrollmentId(enrollment.id);
-    if (!ticket || ticket.status === "RESERVED" || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
-        throw cannotBookingError();
-    }
-
-    const room = await roomRepository.findRoomById(roomId)
-    const bookings = await bookingRepository.findByRoomId(roomId);
-    if (room.capacity <= bookings.length) {
-        throw cannotBookingError();
-    }
-
+    await checkValidBooking(roomId);
     const booking = await bookingRepository.findByUserId(userId)
     if (!booking) {
         throw cannotBookingError();
     }
 
-    return bookingRepository.upsertBooking({ roomId, userId, id: booking.id});
+    return bookingRepository.upsertBooking({ roomId, userId, id: booking.id });
 }
 
 const bookingService = {
