@@ -329,7 +329,7 @@ describe("PUT /booking", () => {
 
             expect(response.status).toEqual(httpStatus.NOT_FOUND);
         });
-        it("should respond with status 403 with a invalid body - there's not vacancy", async () => {
+        it("should respond with status 403 with an invalid body and that there are no vacancies", async () => {
             const user = await createUser();
             const token = await generateValidToken(user);
             const enrollment = await createEnrollmentWithAddress(user);
