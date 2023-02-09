@@ -203,6 +203,30 @@ describe("POST /booking", () => {
 
             expect(response.status).toEqual(httpStatus.FORBIDDEN);
         });
+        it("should respond with status 403 when the user does not have a enrollment", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const hotel = await createHotel();
+            const room = await createRoomWithHotelId(hotel.id);
+
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id});
+
+            expect(response.status).toEqual(httpStatus.FORBIDDEN);
+        });
+        it("should respond with status 403 when the user does not have a paymented ticket", async () => {
+            const user = await createUser();
+            const token = await generateValidToken(user);
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketTypeWithHotel();
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.RESERVED);
+            const hotel = await createHotel();
+            const room = await createRoomWithHotelId(hotel.id);
+
+            const response = await server.post("/booking").set("Authorization", `Bearer ${token}`).send({roomId: room.id});
+
+            expect(response.status).toEqual(httpStatus.FORBIDDEN);
+        });
     });
 });
 

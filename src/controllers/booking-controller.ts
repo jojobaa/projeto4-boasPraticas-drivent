@@ -23,7 +23,7 @@ export async function postBooking(req: AuthenticatedRequest, res: Response) {
         if (!roomId) {
             return res.sendStatus(httpStatus.BAD_REQUEST)
         }
-        const booking = await bookingService.postBooking(userId, Number(roomId));
+        const booking = await bookingService.postBookingRoom(userId, Number(roomId));
 
         return res.status(httpStatus.OK).send({
             bookingId: booking.id,
