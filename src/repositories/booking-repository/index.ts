@@ -44,7 +44,7 @@ async function upsertBooking({ roomId, userId, id }: UpdateBookingParams) {
       userId,
       roomId
     },
-    update:{
+    update: {
       roomId
     }
   })
